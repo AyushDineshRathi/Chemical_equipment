@@ -18,6 +18,17 @@ def login(username, password):
     except requests.RequestException as e:
         raise Exception(f"Connection error: {e}")
 
+def register(username, password):
+    url = f"{BASE_URL}/register/"
+    try:
+        response = requests.post(url, json={"username": username, "password": password})
+        if response.status_code == 201:
+            return True
+        else:
+            raise Exception(response.json().get("error", "Registration failed"))
+    except requests.RequestException as e:
+        raise Exception(f"Connection error: {e}")
+
 def get_history(token):
     """
     Fetches the upload history.

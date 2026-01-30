@@ -28,7 +28,7 @@ class ChartCanvas(FigureCanvas):
         self.ax2.clear()
 
         # 1. Equipment Type Distribution (Bar Chart)
-        type_dist = data.get("equipment_type_distribution", {})
+        type_dist = data.get("type_distribution", {})
         types = list(type_dist.keys())
         counts = list(type_dist.values())
 

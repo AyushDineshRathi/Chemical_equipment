@@ -1,13 +1,25 @@
-function Card({ title, children }) {
+function Card({ title, children, style }) {
   return (
     <div style={{
       background: "var(--card)",
-      borderRadius: "12px",
-      padding: "20px",
-      marginBottom: "20px",
-      boxShadow: "0 8px 24px rgba(0,0,0,0.06)"
+      borderRadius: "var(--radius)",
+      padding: "24px",
+      marginBottom: "24px",
+      boxShadow: "var(--shadow-sm)",
+      border: "1px solid var(--border)",
+      ...style
     }}>
-      {title && <h3 style={{ marginBottom: "16px" }}>{title}</h3>}
+      {title && (
+        <h3 style={{ 
+          marginBottom: "20px", 
+          fontSize: "18px", 
+          color: "var(--text)",
+          borderBottom: "1px solid var(--border)",
+          paddingBottom: "12px"
+        }}>
+          {title}
+        </h3>
+      )}
       {children}
     </div>
   );

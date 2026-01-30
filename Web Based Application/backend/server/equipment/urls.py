@@ -4,7 +4,8 @@ from .views import (
     health_check,
     upload_csv,
     dataset_summary,
-    dataset_history
+    dataset_history,
+    generate_report
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('summary/<int:dataset_id>/', dataset_summary),
     path('history/', dataset_history),
     path('report/<int:dataset_id>/', generate_pdf),
+    path('generate-report/', generate_report),
 ]

@@ -21,3 +21,6 @@ export const uploadCSV = (file) => {
 };
 
 export const getHistory = () => API.get("history/");
+
+export const generateReport = (datasetId) =>
+  API.post("generate-report/", { dataset_id: datasetId }, { responseType: "blob" });

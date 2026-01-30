@@ -138,4 +138,117 @@ def generate_pdf(request, dataset_id):
     response = HttpResponse(buffer, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="report_{dataset_id}.pdf"'
 
+
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from datetime import datetime
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_report(request):
+    """
+    Generates a PDF report using ReportLab Platypus.
+    Input: Optional 'dataset_id' in POST data. Default: Latest dataset.
+    """
+    dataset_id = request.data.get('dataset_id')
+
+    if dataset_id:
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+        except Dataset.DoesNotExist:
+            return Response({"error": "Dataset not found"}, status=404)
+    else:
+        # Default to latest
+        dataset = Dataset.objects.order_by('-uploaded_at').first()
+        if not dataset:
+            return Response({"error": "No datasets available"}, status=404)
+
+    # Buffer for PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=72, leftMargin=72,
+        topMargin=72, bottomMargin=18
+    )
+
+    story = []
+    styles = getSampleStyleSheet()
+    
+    # 1. Title Section
+    title_style = styles['Title']
+    story.append(Paragraph("Chemical Equipment Analysis Report", title_style))
+    story.append(Spacer(1, 12))
+
+    # Date & Metadata
+    normal_style = styles['Normal']
+    date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    story.append(Paragraph(f"<b>Generated on:</b> {date_str}", normal_style))
+    story.append(Paragraph(f"<b>Dataset ID:</b> {dataset.id}", normal_style))
+    story.append(Paragraph(f"<b>File Name:</b> {dataset.file_name}", normal_style))
+    story.append(Spacer(1, 24))
+
+    # 2. Summary Section
+    story.append(Paragraph("Summary Statistics", styles['Heading2']))
+    story.append(Spacer(1, 12))
+    
+    summ = dataset.summary
+    # Safe access with defaults
+    total = summ.get('total_equipment', 0)
+    avg_flow = summ.get('average_flowrate', 0)
+    avg_press = summ.get('average_pressure', 0)
+    avg_temp = summ.get('average_temperature', 0)
+
+    summary_data = [
+        ["Metric", "Value"],
+        ["Total Equipment", str(total)],
+        ["Average Flowrate", f"{avg_flow:.2f} L/min"],
+        ["Average Pressure", f"{avg_press:.2f} bar"],
+        ["Average Temperature", f"{avg_temp:.2f} °C"]
+    ]
+
+    t_summ = Table(summary_data, colWidths=[200, 200])
+    t_summ.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+    story.append(t_summ)
+    story.append(Spacer(1, 24))
+
+    # 3. Equipment Type Distribution
+    story.append(Paragraph("Equipment Type Distribution", styles['Heading2']))
+    story.append(Spacer(1, 12))
+
+    type_dist = summ.get('type_distribution', {})
+    if type_dist:
+        dist_data = [["Equipment Type", "Count"]]
+        for k, v in type_dist.items():
+            dist_data.append([str(k), str(v)])
+        
+        t_dist = Table(dist_data, colWidths=[200, 100])
+        t_dist.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (1, 0), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        story.append(t_dist)
+    else:
+        story.append(Paragraph("No distribution data available.", normal_style))
+
+    # Build PDF
+    doc.build(story)
+
+    # Return response
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="equipment_report_{dataset.id}.pdf"'
     return response

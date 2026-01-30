@@ -22,7 +22,7 @@ The **Chemical Equipment Visualizer** allows engineers and operators to upload C
   - Upload Trend analysis.
 - **User Experience**: Drag-and-drop file upload, instant feedback, and history tracking.
 
-![Web Dashboard Screenshot](images/web.png)
+![Web Dashboard Screenshot](Web%20Based%20Application/images/web.png)
 
 
 ### 🖥 Desktop Application (PyQt5)
@@ -31,8 +31,7 @@ The **Chemical Equipment Visualizer** allows engineers and operators to upload C
 - **Seamless Sync**: Shares the same backend and history with the web platform.
 - **Professional Styling**: Polished QSS (Qt Stylesheets) for a modern look.
 
-![Desktop Application Screenshot](images/desktop.png)
-
+![Desktop Application Screenshot](Web%20Based%20Application/images/desktop.png)
 
 ## 🛠 Tech Stack
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { getHistory } from "../services/api";
+import Card from "./Card";
 
-function HistoryList() {
+function HistoryList({ onLoad }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -10,6 +11,7 @@ function HistoryList() {
       try {
         const res = await getHistory();
         setHistory(res.data);
+        onLoad(res.data);
       } catch (err) {
         console.error("Failed to fetch history", err);
       } finally {
@@ -23,21 +25,25 @@ function HistoryList() {
   if (loading) return <p>Loading history...</p>;
 
   return (
-    <div>
-      <h3>Upload History (Last 5)</h3>
-      {history.length === 0 ? (
-        <p>No uploads yet</p>
-      ) : (
-        <ul>
-          {history.map((item) => (
-            <li key={item.id}>
-              <strong>{item.file_name}</strong> <br />
-              <small>{new Date(item.uploaded_at).toLocaleString()}</small>
+    <Card title="Upload History">
+        <ul style={{ listStyle: "none", padding: 0 }}>
+            {history.map((item) => (
+            <li
+                key={item.id}
+                style={{
+                padding: "12px",
+                borderBottom: "1px solid var(--border)"
+                }}
+            >
+                <strong>{item.file_name}</strong>
+                <br />
+                <small style={{ color: "var(--secondary)" }}>
+                {new Date(item.uploaded_at).toLocaleString()}
+                </small>
             </li>
-          ))}
+            ))}
         </ul>
-      )}
-    </div>
+    </Card>
   );
 }
 

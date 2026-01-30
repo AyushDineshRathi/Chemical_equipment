@@ -9,10 +9,31 @@ from PyQt5.QtWidgets import (
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-
 class DesktopApp(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.setStyleSheet("""
+            QWidget {
+                font-family: Segoe UI;
+                font-size: 11pt;
+            }
+            QPushButton {
+                background-color: #2563eb;
+                color: white;
+                padding: 8px;
+                border-radius: 6px;
+            }
+            QPushButton:hover {
+                background-color: #1e40af;
+            }
+            QTextEdit {
+                background-color: #f8fafc;
+                border-radius: 6px;
+                padding: 8px;
+            }
+        """)
+        
         self.setWindowTitle("Chemical Equipment Visualizer (Desktop)")
         self.setGeometry(100, 100, 700, 600)
 
@@ -48,7 +69,10 @@ class DesktopApp(QWidget):
 
         with open(file_path, "rb") as f:
             files = {"file": f}
-            response = requests.post(url, files=files)
+            headers = {
+                "Authorization": "Token 1ba0d4e2eae38c3052556d0efa71eda24b4f3e87"
+            }
+            response = requests.post(url, files=files, headers=headers)
 
         if response.status_code == 200:
             data = response.json()

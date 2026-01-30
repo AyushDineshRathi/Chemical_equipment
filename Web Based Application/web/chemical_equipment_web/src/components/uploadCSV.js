@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { uploadCSV } from "../services/api";
+import Card from "./Card";
 
 function UploadCSV({ onUploadSuccess }) {
   const [file, setFile] = useState(null);
@@ -29,22 +30,32 @@ function UploadCSV({ onUploadSuccess }) {
   };
 
   return (
-    <div>
-      <h2>Upload CSV</h2>
-
-      <input
+    <Card title="Upload Dataset">
+        <input
         type="file"
         accept=".csv"
         onChange={(e) => setFile(e.target.files[0])}
-      />
+        style={{ marginBottom: "12px" }}
+        />
 
-      <br /><br />
+        <br />
 
-      <button onClick={handleUpload} disabled={loading}>
-        {loading ? "Uploading..." : "Upload"}
-      </button>
-    </div>
-  );
+        <button
+        onClick={handleUpload}
+        disabled={loading}
+        style={{
+            padding: "10px 16px",
+            background: "var(--primary)",
+            color: "#fff",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer"
+        }}
+        >
+        {loading ? "Uploading..." : "Upload CSV"}
+        </button>
+    </Card>
+    );
 }
 
 export default UploadCSV;

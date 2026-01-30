@@ -30,8 +30,12 @@ def register_user(request):
     if User.objects.filter(username=username).exists():
         return Response({"error": "Username already taken"}, status=400)
 
-    user = User.objects.create_user(username=username, password=password)
-    return Response({"message": "User registered successfully"}, status=201)
+    try:
+        user = User.objects.create_user(username=username, password=password)
+        return Response({"message": "User registered successfully"}, status=201)
+    except Exception as e:
+        print(f"Registration Error: {e}")
+        return Response({"error": str(e)}, status=500)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

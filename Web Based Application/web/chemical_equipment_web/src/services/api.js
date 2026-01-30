@@ -14,6 +14,8 @@ API.interceptors.request.use((config) => {
 
 export default API;
 
+export const register = (username, password) => API.post("register/", { username, password });
+
 export const uploadCSV = (file) => {
   const formData = new FormData();
   formData.append("file", file);

@@ -25,7 +25,11 @@ def register(username, password):
         if response.status_code == 201:
             return True
         else:
-            raise Exception(response.json().get("error", "Registration failed"))
+            try:
+                err = response.json().get("error", "Registration failed")
+            except:
+                err = f"Server Error ({response.status_code}): {response.text[:200]}"
+            raise Exception(err)
     except requests.RequestException as e:
         raise Exception(f"Connection error: {e}")
 

@@ -20,7 +20,7 @@ function HistoryList({ onLoad }) {
     };
 
     fetchHistory();
-  }, []);
+  }, [onLoad]);
 
   if (loading) return <p>Loading history...</p>;
 

@@ -14,9 +14,20 @@ function Login({ onLogin }) {
     setMessage("");
     try {
       if (isLogin) {
-        const res = await axios.post("https://chemical-equipment-ituh.onrender.com/api/token/", { username, password });
-        localStorage.setItem("token", res.data.token);
-        onLogin(res.data.token);
+        // Use the centralized Axios instance
+        // Now that backend exposes /api/token/, this should work
+        // NOTE: Standard DRF token view expects "username" and "password"
+        const api = await import("../services/api");
+        const res = await api.default.post("token/", { username, password });
+        
+        // DRF returns { "token": "..." }
+        const token = res.data.token;
+        if (token) {
+            localStorage.setItem("token", token);
+            onLogin(token);
+        } else {
+            setError("Login failed: No token received");
+        }
       } else {
         const api = await import("../services/api");
         await api.register(username, password);
@@ -26,7 +37,14 @@ function Login({ onLogin }) {
       }
     } catch (err) {
       console.error(err);
-      setError(isLogin ? "Invalid credentials" : (err.response?.data?.error || "Registration failed"));
+      if (err.response && err.response.status === 404) {
+        // This likely means the backend hasn't been redeployed with the new /api/token/ endpoint
+        setError("Login service unavailable (404). Please redeploy the backend.");
+      } else if (isLogin) {
+        setError("Invalid credentials");
+      } else {
+        setError(err.response?.data?.error || "Registration failed");
+      }
     }
   };
 

@@ -14,6 +14,10 @@ function HistoryList({ onLoad }) {
         onLoad(res.data);
       } catch (err) {
         console.error("Failed to fetch history", err);
+        if (err.response && err.response.status !== 401) {
+             // 401 is handled by interceptor or App logic mostly, but good to not spam console for it
+             console.error("History fetch error:", err);
+        }
       } finally {
         setLoading(false);
       }

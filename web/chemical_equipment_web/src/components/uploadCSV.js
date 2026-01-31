@@ -23,7 +23,11 @@ function UploadCSV({ onUploadSuccess }) {
       }
     } catch (error) {
       console.error("Upload failed:", error);
-      alert("Upload failed");
+      if (error.response && error.response.status === 401) {
+          alert("Session expired. Please login again.");
+      } else {
+          alert("Upload failed. Please check your file and connection.");
+      }
     } finally {
       setLoading(false);
     }

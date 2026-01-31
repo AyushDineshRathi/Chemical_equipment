@@ -14,7 +14,7 @@ function Login({ onLogin }) {
     setMessage("");
     try {
       if (isLogin) {
-        const res = await axios.post("http://127.0.0.1:8000/api/token/", { username, password });
+        const res = await axios.post("https://chemical-equipment-ituh.onrender.com/api/token/", { username, password });
         localStorage.setItem("token", res.data.token);
         onLogin(res.data.token);
       } else {
